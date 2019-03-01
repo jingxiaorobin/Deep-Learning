@@ -1,0 +1,169 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+
+\title{Deep Learning DS-GA 1008  Assignment2}
+
+\author{Xiao Jing xj655}
+\date{February 2019}
+
+\usepackage{natbib}
+\usepackage{graphicx}
+
+\begin{document}
+
+\maketitle
+
+\section{Convolution}
+\item (a)
+What is the dimensionality of the output if we forward propagate the image over the given convolution kernel with no padding and stride of 1?
+
+Answer: The dimension is 3x3 \\
+
+\item (b)
+Give a general formula of the output width O in terms of the input width I, kernel width K, stride S, and padding P (both in the beginning and in the end).\\
+
+Answer:
+$$
+O = \frac{I-K+2P}{S} +1
+$$
+In the example of (a), I=5, K=3, P=0, S=1.
+We can get the same answer that the dimension O=3.\\
+
+\item (c)
+Compute the output C of forward propagating the image over the given convolution kernel. Assume that the bias term of the convolution is zero.
+
+Answer:\\
+
+\begin{tabular}{|c |c| c|}
+     \hline
+      109	& 92 & 72\\
+      \hline
+       108	& 85 & 74\\
+       \hline
+        110	& 74 & 79\\
+        \hline
+\end{tabular}
+
+\item (d) 
+Suppose the gradient backpropagated from the layers above this layer is a 3 × 3 matrix of all 1s. Write the value of the gradient (w.r.t. the input image) backpropagated out of this layer.\\
+
+Answer:
+
+Assume $a_i_j\in A$,and $i,j\in$  $\{1,2,\cdot\cdot\cdot,5\}$
+$$
+\frac{\partial E}{\partial A} = \frac{\partial E}{\partial C}\frac{\partial C}{\partial A}
+$$
+
+Since for each scalar
+$$
+\frac{\partial E}{\partial c_i_j} = 1
+$$
+So $\frac{\partial E}{\partial C}$ is a 3x3 matrix\\
+\begin{tabular}{|c |c| c|}
+     \hline
+       1 & 1 & 1\\
+      \hline
+       1 & 1 & 1\\
+       \hline
+       1 & 1& 1 \\
+        \hline
+\end{tabular}\\
+
+For each $$\frac{\partial E}{\partial a\textsubscript{ij}} = 1*\frac{\partial C}{\partial a\textsubscript{ij}}$$
+
+For each $\frac{\partial C}{\partial a\textsubscript{ij}}$,is to figure out how many weights in the kernel apply on the $a\textsubscript{ij}$
+
+Since 
+$$
+\frac{\partial C}{\partial A} =\left[
+\begin{array}{c c c c}
+    \frac{\partial C}{\partial a\textsubscript{11}}&\frac{\partial C}{\partial a\textsubscript{12}}&\cdots&\frac{\partial C}{\partial a\textsubscript{15}} \\
+    \frac{\partial C}{\partial a\textsubscript{21}}&\frac{\partial C}{\partial a\textsubscript{22}}&\cdots&\frac{\partial C}{\partial a\textsubscript{25}} \\
+    \vdots &\vdots &\ddots&\vdots \\
+    \frac{\partial C}{\partial a\textsubscript{51}}&\frac{\partial C}{\partial a\textsubscript{52}}&\cdots&\frac{\partial C}{\partial a\textsubscript{55}}
+\end{array}
+\right]\\
+=\left[
+\begin{array}{c c c c c}
+    4&7&10&6&3&\\
+    9&17& 25& 16& 8\\
+    11&23&34&22& 11\\
+    4&12& 18& 12& 6\\
+    2&6& 9&6& 3
+\end{array}
+\right]
+$$
+So, the backpropagation of this layer is 
+$$
+\left[
+\begin{array}{c c c c c}
+    4&7&10&6&3&\\
+    9&17& 25& 16& 8\\
+    11&23&34&22& 11\\
+    4&12& 18& 12& 6\\
+    2&6& 9&6& 3
+\end{array}
+\right]
+$$
+
+
+\section{Pooling}
+\item  (a)
+\\
+1. torch.nn.MaxPool2d--- will pick the maximum value  over each  kernel size area from the input. In regular max pooling, you downsize an input set by taking the maximum value of smaller N x N subsections of the set (often 2x2), and try to reduce the set by a factor of N, where N is an integer.\\
+
+2. torch.nn.AvgPool2d---will take the average of value over each kernel size  area from the input \\
+
+3. torch.nn.LPPool2d---Learn-norm Pooling will apply a 2D power-average pooling over an input signal composed of several inputplanes.\\
+
+4. torch.nn.AdaptiveAvgPool2d---Applies a adaptive average pooling over an input signal composed of several input planes.\\
+
+5.torch.nn.FractionalMaxPool2d---Slightly differenct from maxpooling. The overall reduction ratio N does not have to be an integer.The sizes of the pooling regions are generated randomly but are fairly uniform.
+
+
+\item  (b)
+\\
+1. Max Pooling 2d, when $S^k_{i,j}$ is the indices of $X^k$.
+\begin{equation}
+    Y^k_{i,j}  = \max(X^k_in)=\max (X^k[S^k_{i,j}])
+\end{equation}
+
+2. Average Pooling 2d
+\begin{equation}
+    Y^k_{i,j}  = average(X^k_in) = average(X^k[S^k_{i,j}])
+\end{equation}
+
+3. LP-Pooling 2d
+\begin{equation}
+        Y^k_{i,j} = \sqrt[p]{\sum_{x \in X^k[S^k_{i,j}]k} x^{p}}
+\end{equation}
+- x is the elements in sub-region $X^k$\\
+- At $p = \infty, f(X)$ gets Max Pooling\\
+- At p = 1, one gets Sum Pooling (which is proportional to Average Pooling)
+\\\\
+\item  (c)Answer:
+\\\\
+\begin{tabular}{|c |c|}
+     \hline
+      109	& 92 \\
+      \hline
+       110	& 85\\
+        \hline
+\end{tabular}
+\\\\
+\item  (d)
+
+In LP pooling\\
+When power p = 1, one gets Sum Pooling (which is proportional to Average Pooling)
+\begin{equation}
+        Y^k_{i,j} = \sqrt[p]{\sum_{x \in X^k[S^k_{i,j}]} x^{p}} = \sqrt[1]{\sum_{x \in X^k[S^k_{i,j}]} x} = \sum_{x \in X^k[S^k_{i,j}]} x = 
+        S^k_{i,j}\text{count} \cdot average(X^k[S^k_{i,j}])\\ 
+        =\text{count}\{S^k_{i,j}\}\cdot Y^k_{avg,ij}
+\end{equation}
+\\
+When $p = \infty$,
+\begin{equation}
+        Y^k_{i,j} = \sqrt[p]{\sum_{x \in X^k[S^k_{i,j}]} x^{p}} \approx \sqrt[p]{\max_{x \in X^k[S^k_{i,j}]} (x^{p})} = \max(X^k[S^k_{i,j}])
+\end{equation}
+
+\end{document}
