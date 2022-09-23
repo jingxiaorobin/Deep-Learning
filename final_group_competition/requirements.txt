@@ -26,7 +26,7 @@ paramiko==2.4.2
 Pillow==6.0.0
 plac==0.9.6
 preshed==2.0.1
-protobuf==3.7.1
+protobuf==3.18.3
 pyasn1==0.4.5
 pycodestyle==2.5.0
 pycosat==0.6.3
